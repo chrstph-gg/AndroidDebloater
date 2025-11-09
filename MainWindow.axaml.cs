@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using AndroidDebloater.Components;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Media.TextFormatting.Unicode;
-using MsBox.Avalonia;
 
 namespace AndroidDebloater
 {
@@ -22,41 +18,34 @@ namespace AndroidDebloater
             DebloatBtn.IsEnabled = false;
             CDebloatBtn.IsEnabled = false;
             mSelector.IsEnabled = false;
-            sSelector.IsEnabled = false;
             ScriptPanel.IsVisible = false;
             CustomPanel.IsVisible = false;
-            cSelector.IsEnabled = false;
-            clOutput.Text = BuildHelp();
-        }
-
-        public void ShowHelp(object sender, RoutedEventArgs args)
-        {
-            var helpBox = MessageBoxManager.GetMessageBoxStandard("Help", "Welcome to AndroidDebloater!\n\n"
-                                                                          + "To get started, please enable USB-Debugging on your Phone.\n"
-                                                                          + "To do this, go to the about page in your settings and click the 'Build number' 7 times.\n" 
-                                                                          + "Next, go to Developer Settings and Enable USB-Debugging.\n\n"
-                                                                          + "Now connect your phone, allow Debugging for your PC on your Phone and Click the 'List ADB Devices' button.\n\n"
-                                                                          + "If there are any problems when using this App, feel free to open an Issue on GitHub.", MsBox.Avalonia.Enums.ButtonEnum.Ok);
-            var result = helpBox.ShowAsPopupAsync(this);
+            HelpPanel.IsVisible = false;
+            EasyDebloatButton.IsEnabled = false;
+            ProDebloatButton.IsEnabled = false;
+            ClOutputBox.IsVisible = false;
         }
 
         public void ListDevices(object sender, RoutedEventArgs args)
         {
-            clOutput.Text = ShellExecutor.ListADB();
+            ClOutput.Text = ShellExecutor.ListADB();
+            ConnectedDevicesLabel.Content = ShellExecutor.ListADB();
             // Regular expression to match the exact word "device"
             string pattern = @"\bdevice\b";
 
             // Match only lines with the exact word "device"
-            foreach (string line in clOutput.Text.Split('\n'))
+            foreach (string line in ClOutput.Text.Split('\n'))
             {
                 if (Regex.IsMatch(line.Trim(), pattern))
                 {
                     Console.WriteLine($"Matched: {line.Trim()}");
                     DebloatBtn.IsEnabled = true;
                     CDebloatBtn.IsEnabled = true;
-                    cSelector.IsEnabled = true;
-                    sSelector.IsEnabled = true;
-                    ScriptPanel.IsVisible = true;
+                    EasyDebloatButton.IsEnabled = true;
+                    ProDebloatButton.IsEnabled = true;
+                    //cSelector.IsEnabled = true;
+                    //sSelector.IsEnabled = true;
+                    //ScriptPanel.IsVisible = true;
                 }
             }
         }
@@ -66,13 +55,13 @@ namespace AndroidDebloater
             
             if ((bool)gDebloat.IsChecked)
             {
-                clOutput.Text = ShellExecutor.StartDebloat(1);
+                ClOutput.Text = ShellExecutor.StartDebloat(1);
             }else if ((bool)aDebloat.IsChecked)
             {
-                clOutput.Text = ShellExecutor.StartDebloat(2);
+                ClOutput.Text = ShellExecutor.StartDebloat(2);
             }else if ((bool)tpDebloat.IsChecked)
             {
-                clOutput.Text = ShellExecutor.StartDebloat(3);
+                ClOutput.Text = ShellExecutor.StartDebloat(3);
             }
             else
             {
@@ -83,35 +72,35 @@ namespace AndroidDebloater
                 {
                     case 0:
                         //Google
-                        clOutput.Text = ShellExecutor.StartDebloat(4);
+                        ClOutput.Text = ShellExecutor.StartDebloat(4);
                         break;
                     case 1:
                         //Huawei
-                        clOutput.Text = ShellExecutor.StartDebloat(5);
+                        ClOutput.Text = ShellExecutor.StartDebloat(5);
                         break;
                     case 2:
                         //Oneplus
-                        clOutput.Text = ShellExecutor.StartDebloat(6);
+                        ClOutput.Text = ShellExecutor.StartDebloat(6);
                         break;
                     case 3:
                         //Oppo
-                        clOutput.Text = ShellExecutor.StartDebloat(7);
+                        ClOutput.Text = ShellExecutor.StartDebloat(7);
                         break;
                     case 4:
                         //Realme
-                        clOutput.Text = ShellExecutor.StartDebloat(8);
+                        ClOutput.Text = ShellExecutor.StartDebloat(8);
                         break;
                     case 5:
                         //Samsung
-                        clOutput.Text = ShellExecutor.StartDebloat(9);
+                        ClOutput.Text = ShellExecutor.StartDebloat(9);
                         break;
                     case 6:
                         //Vivo
-                        clOutput.Text = ShellExecutor.StartDebloat(10);
+                        ClOutput.Text = ShellExecutor.StartDebloat(10);
                         break;
                     case 7:
                         //Xiaomi
-                        clOutput.Text = ShellExecutor.StartDebloat(11);
+                        ClOutput.Text = ShellExecutor.StartDebloat(11);
                         break;
                 }
             }
@@ -131,12 +120,36 @@ namespace AndroidDebloater
         {
             ScriptPanel.IsVisible = true;
             CustomPanel.IsVisible = false;
+            ListPanel.IsVisible = false;
+            ClOutputBox.IsVisible = true;
+            HelpPanel.IsVisible = false;
+        }
+
+        public void ShowDeviceList(object sender, RoutedEventArgs args)
+        {
+            ScriptPanel.IsVisible = false;
+            CustomPanel.IsVisible = false;
+            ListPanel.IsVisible = true;
+            ClOutputBox.IsVisible = false;
+            HelpPanel.IsVisible = false;
+        }
+
+        public void ShowHelpPanel(object sender, RoutedEventArgs args)
+        {
+            ScriptPanel.IsVisible = false;
+            CustomPanel.IsVisible = false;
+            ListPanel.IsVisible = false;
+            ClOutputBox.IsVisible = false;
+            HelpPanel.IsVisible = true;
         }
 
         public void ShowCustomSelector(object sender, RoutedEventArgs args)
         {
             CustomPanel.IsVisible = true;
             ScriptPanel.IsVisible = false;
+            ListPanel.IsVisible = false;
+            ClOutputBox.IsVisible = true;
+            HelpPanel.IsVisible = false;
             
             _items = new ObservableCollection<AndroidPackage>(CreateObservableCollection(ShellExecutor.GetPackages()));
 
@@ -156,11 +169,11 @@ namespace AndroidDebloater
                 }
             }
             
-            clOutput.Text = "Uninstalling " + selectedItems.Count + " packages... \n";
+            ClOutput.Text = "Uninstalling " + selectedItems.Count + " packages... \n";
             
             foreach (var item in selectedItems)
             {
-                clOutput.Text += item + ": " +ShellExecutor.RemovePackage(item);
+                ClOutput.Text += item + ": " +ShellExecutor.RemovePackage(item);
             }
         }
         
@@ -179,17 +192,6 @@ namespace AndroidDebloater
             }
 
             return collection;
-        }
-
-        public string BuildHelp()
-        {
-            string help = "Welcome to AndroidDebloater!\n\n"
-                + "To get started, please enable USB-Debugging on your Phone.\n"
-                + "To do this, go to the about page in your settings and click the 'Build number' 7 times.\n" 
-                + "Next, go to Developer Settings and Enable USB-Debugging.\n\n"
-                + "Now connect your phone, allow Debugging for your PC on your Phone and Click the 'List ADB Devices' button.\n\n"
-                + "If there are any problems when using this App, feel free to open an Issue on GitHub.";
-            return help;
         }
     }
 }

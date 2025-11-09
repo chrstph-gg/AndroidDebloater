@@ -2,123 +2,178 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
         x:Class="AndroidDebloater.MainWindow"
         xmlns:components="clr-namespace:AndroidDebloater.Components"
         Title="AndroidDebloater"
-        Width="800" Height="450">
+        Width="900" Height="500"
+        MaxWidth="900" MaxHeight="500">
 	<Grid Margin="10">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*"/>
-			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="20*"/>
+			<ColumnDefinition Width="80*"/>
 		</Grid.ColumnDefinitions>
 
-		<!--Left Column-->
-		<Grid Grid.Row="0">
+		<!-- Nav Column -->
+		<Button Click="ShowDeviceList" Grid.Row="0" Grid.Column="0" Content="List Devices" Padding="45, 50" Background="ForestGreen" Foreground="White"/>
+		<Button x:Name="EasyDebloatButton" Click="ShowScripts" Grid.Row="1" Grid.Column="0" Content="EasyDebloat" Padding="43, 50" Background="ForestGreen" Foreground="White"/>
+		<Button x:Name="ProDebloatButton" Click="ShowCustomSelector" Grid.Row="2" Grid.Column="0" Content="ProDebloat" Padding="48, 50" Background="ForestGreen" Foreground="White"/>
+		<Button Click="ShowHelpPanel" Grid.Row="3" Grid.Column="0" Content="Help" Padding="70, 50" Background="ForestGreen" Foreground="White"/>
+		
+		<!-- Content Column -->
+		<Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="4" Margin="10">
 			<Grid.RowDefinitions>
-				<RowDefinition Height="auto"/>
-				<RowDefinition Height="auto"/>
-				<RowDefinition Height="auto"/>
-			</Grid.RowDefinitions>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="*"/>
-			</Grid.ColumnDefinitions>
-			<Label Grid.Row="0" Grid.Column="0" Content="See Connected Devices"/>
-			<Button Click="ListDevices" Grid.Row="1" Grid.Column="0" Content="List ADB Devices"/>
-			<RadioButton x:Name="sSelector" Click="ShowScripts" Grid.Row="2" IsChecked="True" Grid.Column="0" Content="Use Scripts"/>
-			<RadioButton x:Name="cSelector" Click="ShowCustomSelector" Grid.Row="2" Grid.Column="1" Content="Custom Select"/>
+				<RowDefinition Height="80*"/>
+				<RowDefinition Height="20*"/>
+			</Grid.RowDefinitions> 
+		
+			<!-- Device List Content -->
+			<StackPanel x:Name="ListPanel" Grid.Row="0" Grid.Column="0">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+					</Grid.RowDefinitions>
+					<Label Grid.Row="0" Content="Connected Devices" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
+					<Label Grid.Row="1" Content="This page lists all your connected devices." HorizontalAlignment="Center" FontWeight="Bold"/>
+					<Button Grid.Row="2" Click="ListDevices" Content="Check devices" HorizontalAlignment="Center"/>
+					<Label Grid.Row="3" x:Name="ConnectedDevicesLabel"/>
+				</Grid>
+			</StackPanel>
+			
+			<!-- EasyDebloat Content -->
+			<StackPanel x:Name="ScriptPanel" Grid.Column="0" Grid.Row="0">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="auto"/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+				
+					<Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Content="EasyDebloat" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
+					<Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Content="EasyDebloat allows you to debloat your device using pre-made scripts." HorizontalAlignment="Center" FontWeight="Bold"/>
+					
+					<Label Grid.Row="2" Grid.Column="0" Margin="0 20 0 0" Content="Select your Debloat Package"/>
+					<RadioButton Click="DisableSelector" x:Name="gDebloat" IsChecked="True" Grid.Row="3" Grid.Column="0" Content="Google Bloatware"/>
+					<RadioButton Click="DisableSelector" x:Name="aDebloat" Grid.Row="3" Grid.Column="1" Content="Android System Bloat"/>
+					<RadioButton Click="DisableSelector" x:Name="tpDebloat" Grid.Row="4" Grid.Column="0" Content="Third-Party Bloat"/>
+			
+					<Label Grid.Row="5" Grid.Column="0" Margin="0 20 0 0" Content="Manufacturer Debloat"/>
+					<RadioButton Click="EnableSelector" x:Name="mDebloat" Grid.Row="6" Grid.Column="0" Content="Manufacturer Specific"/>
+					<ComboBox x:Name="mSelector" Grid.Row="6" Grid.Column="1">
+						<ComboBoxItem Content="Google" IsSelected="True"/>
+						<ComboBoxItem Content="Huawei"/>
+						<ComboBoxItem Content="OnePlus"/>
+						<ComboBoxItem Content="Oppo"/>
+						<ComboBoxItem Content="Realme"/>
+						<ComboBoxItem Content="Samsung"/>
+						<ComboBoxItem Content="Vivo"/>
+						<ComboBoxItem Content="Xiaomi"/>
+					</ComboBox>
+			
+					<Button x:Name="DebloatBtn" Click="StartDebloater" Grid.Row="7" Grid.Column="0" VerticalAlignment="Bottom" Content="Start debloat"/>
+			
+				</Grid>
+			</StackPanel>
+		
+			<!-- ProDebloat Content -->
+			<StackPanel x:Name="CustomPanel" Grid.Row="0" IsVisible="false">
+			
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="auto"/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+				
+					<Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Content="ProDebloat" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
+					<Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Content="ProDebloat allows you to select all the packages you want to remove." HorizontalAlignment="Center" FontWeight="Bold"/>
+					
+					<ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" MaxHeight="250" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto" Margin="0 10 0 10">
+						<ItemsControl Name="PackageList">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate DataType="{x:Type components:AndroidPackage}">
+									<CheckBox Content="{Binding Text}"
+									          IsChecked="{Binding IsChecked}"
+									          Margin="0,5,0,0"/>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>
+			
+					<Button x:Name="CDebloatBtn" Click="RemoveSelected" Grid.Row="3" Grid.Column="0" VerticalAlignment="Bottom" Content="Start debloat"/>
+				
+				</Grid>
+			
+			
+			
+			</StackPanel>
+		
+			<!-- Help & Info Content -->
+			<StackPanel x:Name="HelpPanel" Grid.Row="0">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
+					</Grid.RowDefinitions>
+					
+					<Label Grid.Column="0" Grid.Row="0" Content="Help" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
+					<Label Grid.Column="0" Grid.Row="1" Content="Massimo's AndroidDebloater" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,20"/>
+					<Label Grid.Row="2" Content="How do I use AndroidDebloater?" FontSize="15" FontWeight="Bold"/>
+					<Label Grid.Row="3" Content="To start, you need to enable USB-Debugging on your device."/>
+					<Label Grid.Row="4" Content="USB-Debugging can be enabled in Settings:"/>
+					<Label Grid.Row="5" Content="Settings -> 'About' or 'Systeminfo' -> Press 'Build-Number' 7 times"/>
+					<Label Grid.Row="6" Content="Developer Settings -> Enable USB-Debugging"/>
+					<Label Grid.Row="7" Content="Connect your device to your PC and allow USB-Debugging"/>
+					<Label Grid.Row="8" Content="Click on 'List devices' in AndroidDebloater and click 'Check devices'"/>
+					<Label Grid.Row="9" Content="Now you're able to use EasyDebloat or ProDebloat."/>
+					<Label Grid.Row="10" Content="If you have any issues, feel free to open an issue on GitHub." FontWeight="Bold" Margin="0,20"/>
+					
+				</Grid>
+				
+			</StackPanel>
+		
+			<!-- CLI Output Row/Column -->
+			<Border x:Name="ClOutputBox" Grid.Row="1" BorderThickness="1" BorderBrush="Black">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+					<TextBox x:Name="ClOutput" Grid.Row="1" Background="Black" Foreground="White" IsReadOnly="True" Text="" TextWrapping="Wrap"/>
+				</Grid>
+			</Border>
 		</Grid>
-		
-		
-		<StackPanel x:Name="ScriptPanel" Grid.Column="0" Grid.Row="1">
-			<Grid>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="auto"/>
-				<RowDefinition Height="auto"/>
-				<RowDefinition Height="auto"/>
-				<RowDefinition Height="auto"/>
-				<RowDefinition Height="auto"/>
-				<RowDefinition Height="*"/>
-			</Grid.RowDefinitions>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="auto"/>
-				<ColumnDefinition Width="auto"/>
-			</Grid.ColumnDefinitions>
-				
-				<Label Grid.Row="0" Grid.Column="0" Margin="0 20 0 0" Content="Select your Debloat Package"/>
-			<RadioButton Click="DisableSelector" x:Name="gDebloat" IsChecked="True" Grid.Row="1" Grid.Column="0" Content="Google Bloatware"/>
-			<RadioButton Click="DisableSelector" x:Name="aDebloat" Grid.Row="1" Grid.Column="1" Content="Android System Bloat"/>
-			<RadioButton Click="DisableSelector" x:Name="tpDebloat" Grid.Row="2" Grid.Column="0" Content="Third-Party Bloat"/>
-			
-			<Label Grid.Row="3" Grid.Column="0" Margin="0 20 0 0" Content="Manufacturer Debloat"/>
-			<RadioButton Click="EnableSelector" x:Name="mDebloat" Grid.Row="4" Grid.Column="0" Content="Manufacturer Specific"/>
-			<ComboBox x:Name="mSelector" Grid.Row="4" Grid.Column="1">
-				<ComboBoxItem Content="Google" IsSelected="True"/>
-				<ComboBoxItem Content="Huawei"/>
-				<ComboBoxItem Content="OnePlus"/>
-				<ComboBoxItem Content="Oppo"/>
-				<ComboBoxItem Content="Realme"/>
-				<ComboBoxItem Content="Samsung"/>
-				<ComboBoxItem Content="Vivo"/>
-				<ComboBoxItem Content="Xiaomi"/>
-			</ComboBox>
-			
-			<Button x:Name="DebloatBtn" Click="StartDebloater" Grid.Row="5" Grid.Column="0" VerticalAlignment="Bottom" Content="Start Debloat"/>
-			<Button Click="ShowHelp" Grid.Row="5" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Help"/>
-			
-		</Grid>
-		</StackPanel>
-		
-		<StackPanel x:Name="CustomPanel" Grid.Row="1" IsVisible="false">
-			
-			<Grid>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="*"/>
-					<RowDefinition Height="auto"/>
-				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="*"/>
-				</Grid.ColumnDefinitions>
-				
-				<ScrollViewer Grid.Row="0" Grid.ColumnSpan="2" MaxHeight="300" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto" Margin="0 10 0 10">
-					<ItemsControl Name="PackageList">
-						<ItemsControl.ItemTemplate>
-							<DataTemplate DataType="{x:Type components:AndroidPackage}">
-								<CheckBox Content="{Binding Text}"
-								          IsChecked="{Binding IsChecked}"
-								          Margin="0,5,0,0"/>
-							</DataTemplate>
-						</ItemsControl.ItemTemplate>
-					</ItemsControl>
-				</ScrollViewer>
-			
-				<Button x:Name="CDebloatBtn" Click="RemoveSelected" Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" Content="Start Debloat"/>
-				<Button Click="ShowHelp" Grid.Row="1" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Help"/>
-				
-			</Grid>
-			
-			
-			
-		</StackPanel>
-		
-		
-		
-		<!--Right Column-->
-		<Border Grid.Column="1" BorderThickness="1" BorderBrush="Black" Grid.RowSpan="5">
-			<Grid>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="auto"/>
-					<RowDefinition Height="*"/>
-				</Grid.RowDefinitions>
-				<Label Grid.Row="0" Content="Commandline Output"/>
-				<TextBox x:Name="clOutput" Grid.Row="1" Background="Black" Foreground="White" IsReadOnly="True" Text="" TextWrapping="Wrap"/>
-			</Grid>
-		</Border>
 	</Grid>
 </Window>
